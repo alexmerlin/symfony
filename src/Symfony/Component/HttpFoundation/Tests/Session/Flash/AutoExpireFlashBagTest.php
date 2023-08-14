@@ -21,12 +21,9 @@ use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag as FlashBa
  */
 class AutoExpireFlashBagTest extends TestCase
 {
-    /**
-     * @var \Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag
-     */
-    private $bag;
+    protected array $array = [];
 
-    protected $array = [];
+    private FlashBag $bag;
 
     protected function setUp(): void
     {
@@ -38,7 +35,7 @@ class AutoExpireFlashBagTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->bag = null;
+        unset($this->bag);
         parent::tearDown();
     }
 
@@ -115,6 +112,31 @@ class AutoExpireFlashBagTest extends TestCase
         $this->assertEquals([
             'notice' => 'Foo',
             'error' => 'Bar',
+            ], $this->bag->peekAll()
+        );
+    }
+
+    public function testPeekMultiple()
+    {
+        $array = [
+            'new' => [
+                'notice' => 'Foo',
+                'error' => 'Bar',
+                'warning' => 'Baz',
+            ],
+        ];
+
+        $this->bag->initialize($array);
+        $this->assertEquals([
+            'notice' => 'Foo',
+            'warning' => 'Baz',
+            ], $this->bag->peekMultiple(['notice', 'warning'])
+        );
+
+        $this->assertEquals([
+            'notice' => 'Foo',
+            'error' => 'Bar',
+            'warning' => 'Baz',
             ], $this->bag->peekAll()
         );
     }
